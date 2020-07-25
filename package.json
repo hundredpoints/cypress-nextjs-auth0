@@ -1,5 +1,5 @@
 {
-  "name": "cypress-nextjs-auth0",
+  "name": "@hundredpoints/cypress-nextjs-auth0",
   "version": "0.1.1",
   "description": "Cypress commands to support Auth0 and Next.js.",
   "main": "dist/cypress-nextjs-auth0.js",

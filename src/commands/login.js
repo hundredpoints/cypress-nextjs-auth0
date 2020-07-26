@@ -1,15 +1,15 @@
 let cachedUsername;
 
-Cypress.Commands.add('login', (credentials = {}) => {
+Cypress.Commands.add("login", (credentials = {}) => {
   const { username, password } = credentials;
   const cachedUserIsCurrentUser = cachedUsername && cachedUsername === username;
   const _credentials = {
-    username: username || Cypress.env('auth0Username'),
-    password: password || Cypress.env('auth0Password'),
+    username: username || Cypress.env("auth0Username"),
+    password: password || Cypress.env("auth0Password"),
   };
 
-  const sessionCookieName = Cypress.env('auth0SessionCookieName');
-  const stateCookieName = Cypress.env('auth0StateCookieName');
+  const sessionCookieName = Cypress.env("auth0SessionCookieName");
+  const stateCookieName = Cypress.env("auth0StateCookieName");
 
   /* https://github.com/auth0/nextjs-auth0/blob/master/src/handlers/login.ts#L70 */
 
@@ -22,7 +22,8 @@ Cypress.Commands.add('login', (credentials = {}) => {
       } else {
         cy.clearCookies();
 
-        cy.setCookie(stateCookieName, 'some-random-state');
+        const state = "some-random-state";
+        cy.setCookie(stateCookieName, state);
 
         cy.getUserTokens(_credentials).then((response) => {
           const { accessToken, expiresIn, idToken, scope } = response;
@@ -41,16 +42,20 @@ Cypress.Commands.add('login', (credentials = {}) => {
               createdAt: Date.now(),
             };
 
-            /* https://github.com/auth0/nextjs-auth0/blob/master/src/session/cookie-store/index.ts#L73 */
+            cy.onUserLoaded(null, response, persistedSession, state).then(
+              (session) => {
+                /* https://github.com/auth0/nextjs-auth0/blob/master/src/session/cookie-store/index.ts#L73 */
 
-            cy.seal(persistedSession).then((encryptedSession) => {
-              cy.setCookie(sessionCookieName, encryptedSession);
-            });
+                cy.seal(session).then((encryptedSession) => {
+                  cy.setCookie(sessionCookieName, encryptedSession);
+                });
+              }
+            );
           });
         });
       }
     });
-  } catch(error) {
+  } catch (error) {
     // throw new Error(error);
   }
 });

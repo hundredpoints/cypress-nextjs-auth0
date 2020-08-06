@@ -6,9 +6,14 @@ Cypress.Commands.add("login", (credentials = {}, options = {}) => {
   const {
     login: { getState = () => ({}) } = {},
     callback: {
-      onUserLoaded = function (request, response, session, state) {
+      onUserLoaded = cy.wrap(async function (
+        request,
+        response,
+        session,
+        state
+      ) {
         return session;
-      },
+      }),
     } = {},
   } = options;
 

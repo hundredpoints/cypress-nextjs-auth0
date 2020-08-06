@@ -1,5 +1,3 @@
-import { NextApiRequest } from "next";
-
 declare namespace Cypress {
   interface LoginCredentials {
     username: string;
@@ -7,7 +5,7 @@ declare namespace Cypress {
   }
 
   interface LoginOptions {
-    getState: (request: NextApiRequest) => Record<string | number, unknown>;
+    getState: (request?: unknown) => Record<string | number, unknown>;
     password: string;
   }
 

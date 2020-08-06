@@ -1,7 +1,17 @@
 let cachedUsername;
 
-Cypress.Commands.add("login", (credentials = {}) => {
+Cypress.Commands.add("login", (credentials = {}, options = {}) => {
   const { username, password } = credentials;
+
+  const {
+    login: { getState = () => ({}) } = {},
+    callback: {
+      onUserLoaded = function (request, response, session, state) {
+        return session;
+      },
+    } = {},
+  } = options;
+
   const cachedUserIsCurrentUser = cachedUsername && cachedUsername === username;
   const _credentials = {
     username: username || Cypress.env("auth0Username"),
@@ -22,7 +32,11 @@ Cypress.Commands.add("login", (credentials = {}) => {
       } else {
         cy.clearCookies();
 
-        const state = "some-random-state";
+        const state = JSON.stringify({
+          ...getState(),
+          state: "some-random-state",
+        });
+
         cy.setCookie(stateCookieName, state);
 
         cy.getUserTokens(_credentials).then((response) => {
@@ -42,7 +56,7 @@ Cypress.Commands.add("login", (credentials = {}) => {
               createdAt: Date.now(),
             };
 
-            cy.onUserLoaded(null, response, persistedSession, state).then(
+            cy.wrap(onUserLoaded(null, response, persistedSession, state)).then(
               (session) => {
                 /* https://github.com/auth0/nextjs-auth0/blob/master/src/session/cookie-store/index.ts#L73 */
 

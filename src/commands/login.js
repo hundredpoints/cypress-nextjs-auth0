@@ -6,14 +6,9 @@ Cypress.Commands.add("login", (credentials = {}, options = {}) => {
   const {
     login: { getState = () => ({}) } = {},
     callback: {
-      onUserLoaded = cy.wrap(async function (
-        request,
-        response,
-        session,
-        state
-      ) {
-        return session;
-      }),
+      onUserLoaded = function (request, response, session, state) {
+        return cy.wrap(Promise.resolve(session));
+      },
     } = {},
   } = options;
 
@@ -61,10 +56,9 @@ Cypress.Commands.add("login", (credentials = {}, options = {}) => {
               createdAt: Date.now(),
             };
 
-            cy.wrap(onUserLoaded(null, response, persistedSession, state)).then(
+            onUserLoaded(null, response, persistedSession, state).then(
               (session) => {
                 /* https://github.com/auth0/nextjs-auth0/blob/master/src/session/cookie-store/index.ts#L73 */
-
                 cy.seal(session).then((encryptedSession) => {
                   cy.setCookie(sessionCookieName, encryptedSession);
                 });

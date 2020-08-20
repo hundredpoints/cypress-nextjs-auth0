@@ -12,7 +12,7 @@ declare namespace Cypress {
   interface Chainable<Subject = any> {
     login(
       credentials?: LoginCredentials,
-      options: LoginOptions
+      options?: LoginOptions
     ): Chainable<Element>;
     logout(): Chainable<Element>;
   }

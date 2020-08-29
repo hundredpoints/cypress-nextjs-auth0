@@ -1,8 +1,8 @@
-import auth from '../utils/auth';
+import auth from "../utils/auth";
 
-Cypress.Commands.add('logout', (returnTo) => {
+Cypress.Commands.add("logout", (returnTo) => {
   const options = {
-    clientID: Cypress.env('auth0ClientId'),
+    clientID: Cypress.env("auth0ClientId"),
   };
 
   if (returnTo) {
@@ -11,6 +11,6 @@ Cypress.Commands.add('logout', (returnTo) => {
 
   const logoutUrl = auth.client.buildLogoutUrl(options);
 
-  cy.request('/api/logout');
+  cy.request("/api/auth/logout");
   cy.reload();
 });
